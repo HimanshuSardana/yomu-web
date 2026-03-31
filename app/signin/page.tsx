@@ -33,7 +33,7 @@ export default function SignInPage() {
         return;
       }
 
-      router.push("/");
+      router.push("/dashboard");
     } catch (err) {
       setError("Something went wrong. Please try again.");
     } finally {
