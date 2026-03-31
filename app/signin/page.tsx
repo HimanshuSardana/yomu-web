@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -9,13 +9,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/client-auth";
+import { useAuth } from "@/components/use-auth";
 
 export default function SignInPage() {
   const router = useRouter();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    console.log("[SignIn] Auth check:", { isAuthenticated, authLoading });
+    if (!authLoading && isAuthenticated) {
+      console.log("[SignIn] Already authenticated, redirecting to /dashboard");
+      router.push("/dashboard");
+    }
+  }, [authLoading, isAuthenticated, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +50,14 @@ export default function SignInPage() {
       setLoading(false);
     }
   };
+
+  if (authLoading || isAuthenticated === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-foreground" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
